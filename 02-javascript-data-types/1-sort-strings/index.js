@@ -5,7 +5,8 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
-  arr.sort((a, b) => {
+  const stringElements = [...arr]
+  stringElements.sort((a, b) => {
     if (a.localeCompare(b, ['ru', 'en'], { caseFirst: "upper" }) === 1) {
       return 1;
     }
@@ -20,26 +21,8 @@ export function sortStrings(arr, param = 'asc') {
   });
 
   if (param === 'desc') {
-    arr.reverse();
+    stringElements.reverse();
   }
 
-  return arr;
+  return stringElements;
 }
-/*
-
-const fruits = ['абрикос', 'Абрикос', 'яблоко', 'Яблоко', 'ёжик', 'Ёжик'];
-const chars = ['b', 'a', 'c'];
-console.log(fruits)
-sortStrings(fruits, {sort: "asc", localeName: "ru", sensitivity: 'base'});
-console.log(fruits)
-console.log(chars);
-sortStrings(chars, 'asc');
-console.log(chars);
-
-const fruits2 = ['абрикос', 'яблоко', 'ёжик'];
-//['абрикос', 'ёжик', 'яблоко']
-const f = sortStrings(['абрикос', 'яблоко', 'ёжик']);
-console.log(f);
-
-
-*/
