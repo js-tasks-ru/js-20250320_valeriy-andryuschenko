@@ -5,17 +5,17 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
-  const stringElements = [...arr]
+  const stringElements = [...arr];
   stringElements.sort((a, b) => {
-    if (a.localeCompare(b, ['ru', 'en'], { caseFirst: "upper" }) === 1) {
+    if (a.localeCompare(b, ['ru', 'en'], {caseFirst: "upper"}) === 1) {
       return 1;
     }
 
-    if (a.localeCompare(b, ['ru', 'en'], { caseFirst: "upper" }) === 0) {
+    if (a.localeCompare(b, ['ru', 'en'], {caseFirst: "upper"}) === 0) {
       return 0;
     }
 
-    if (a.localeCompare(b, ['ru', 'en'], { caseFirst: "upper" }) === -1) {
+    if (a.localeCompare(b, ['ru', 'en'], {caseFirst: "upper"}) === -1) {
       return -1;
     }
   });
