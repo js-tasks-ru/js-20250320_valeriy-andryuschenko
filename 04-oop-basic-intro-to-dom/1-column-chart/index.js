@@ -1,12 +1,15 @@
 export default class ColumnChart {
   element = document.createElement("div");
-  height = 50
-  backgroundDefault = 'background: url(charts-skeleton.svg)'
-  constructor(params) {
-    this.label = params.label;
-    this.value = params.value;
-    this.link = params.link;
-    this.charts = params.data;
+  chartHeight = 50;
+
+  constructor(params = {}) {
+    this.value = params.value || '';
+    this.label = params.label || '';
+    this.link = params.link || '';
+    this.charts = params.data || [];
+    this.formatHeading = params.formatHeading || '';
+    this.maxValue = Math.max(...this.charts);
+    this.scale = 50 / this.maxValue;
     this.createColumnChart();
   }
 
@@ -14,11 +17,24 @@ export default class ColumnChart {
     this.data = data;
   }
 
+  destroy() {
+    this.element = null;
+  }
+
+  remove() {
+    this.element.remove();
+  }
+
   createColumnChart() {
     this.element.classList.add("column-chart");
-    this.element.style = `--chart-height: ${this.height};`;
+    this.element.style = `--chart-height: ${this.chartHeight};`;
     this.element.insertAdjacentHTML('afterbegin', this.createTitle());
     this.element.append(this.createColumnChartContainer());
+
+    if (this.charts.length === 0) {
+      this.element.classList.add("column-chart_loading");
+    }
+
   }
 
   createColumnChartContainer() {
@@ -26,6 +42,7 @@ export default class ColumnChart {
     container.classList.add("column-chart__container");
     container.append(this.createColumnChartTitle());
     container.append(this.createColumnCharts());
+
     return container;
   }
 
@@ -34,17 +51,20 @@ export default class ColumnChart {
     bodyCharts.classList.add("column-chart__chart");
     bodyCharts.setAttribute("data-element", 'body');
     //добавить колонки
-    if (this.data.length < 0) {
-
-    }
-
     bodyCharts.insertAdjacentHTML('afterbegin', this.createCharts());
+
     return bodyCharts;
   }
 
   createCharts() {
+    if (this.charts.length === 0) {
+      return;
+    }
+
     return this.charts.map(chart => {
-      return `<div style="--value: ${(chart / 100) * this.height}" data-tooltip="${chart}%"></div>`;
+      const percent = (chart / this.maxValue * 100).toFixed(0) + '%';
+      const value = String(Math.floor(chart * this.scale));
+      return `<div style="--value: ${value}" data-tooltip="${percent}"></div>`;
     }).join('');
   }
 
@@ -52,7 +72,7 @@ export default class ColumnChart {
     const chartTitle = document.createElement("div");
     chartTitle.classList.add("column-chart__header");
     chartTitle.setAttribute("data-element", 'header');
-    chartTitle.textContent = this.value;
+    chartTitle.textContent = this.formatHeading ? this.formatHeading(this.value) : this.value;
     return chartTitle;
   }
 
