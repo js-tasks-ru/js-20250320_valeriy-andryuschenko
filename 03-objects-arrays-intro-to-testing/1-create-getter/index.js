@@ -28,7 +28,7 @@ export function createGetterrecursive(path) {
     const searchObject = {...obj}
     const key = fields.shift();
     if (!searchObject.hasOwnProperty(key)) {
-      return undefined;
+      return
     }
 
     if (fields.length === 0) {
@@ -38,11 +38,3 @@ export function createGetterrecursive(path) {
     return getValueByProps(searchObject[key]);
   };
 }
-
-const obj = {
-  category: {
-    title: 'Goods',
-    foo: undefined
-  }
-};
-
