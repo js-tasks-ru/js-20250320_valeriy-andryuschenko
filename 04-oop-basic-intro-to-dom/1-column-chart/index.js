@@ -50,7 +50,6 @@ export default class ColumnChart {
     const bodyCharts = document.createElement("div");
     bodyCharts.classList.add("column-chart__chart");
     bodyCharts.setAttribute("data-element", 'body');
-    //добавить колонки
     bodyCharts.insertAdjacentHTML('afterbegin', this.createCharts());
 
     return bodyCharts;
