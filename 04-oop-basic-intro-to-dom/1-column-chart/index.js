@@ -16,7 +16,7 @@ export default class ColumnChart {
 
   update(data) {
     this.data = data;
-    this.element.innerHTML = this.createTemplate()
+    this.element.innerHTML = this.createTemplate();
   }
 
   destroy() {
