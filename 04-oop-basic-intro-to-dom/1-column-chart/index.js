@@ -25,11 +25,17 @@ export default class ColumnChart {
     this.element.remove();
   }
 
+  createTemplate() {
+    return `
+        ${this.createTitle()}
+        ${this.createColumnChartContainer()}
+    `;
+  }
+
   createColumnChart() {
     this.element.classList.add("column-chart");
     this.element.style = `--chart-height: ${this.chartHeight};`;
-    this.element.insertAdjacentHTML('afterbegin', this.createTitle());
-    this.element.append(this.createColumnChartContainer());
+    this.element.innerHTML = this.createTemplate();
 
     if (this.charts.length === 0) {
       this.element.classList.add("column-chart_loading");
@@ -43,7 +49,7 @@ export default class ColumnChart {
     container.append(this.createColumnChartTitle());
     container.append(this.createColumnCharts());
 
-    return container;
+    return container.outerHTML;
   }
 
   createColumnCharts() {
