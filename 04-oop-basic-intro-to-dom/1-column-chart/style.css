@@ -61,6 +61,7 @@ body {
   flex-grow: 1;
   margin: 0 0 0 1px;
   cursor: pointer;
+  row-gap: 10px;
 }
 
 .column-chart__chart div:first-child {
