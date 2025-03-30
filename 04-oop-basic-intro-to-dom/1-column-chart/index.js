@@ -19,6 +19,7 @@ export default class ColumnChart {
   update(data) {
     this.data = data;
     this.element.innerHTML = this.createTemplate();
+    this.setLoadingDefault();
   }
 
   destroy() {
