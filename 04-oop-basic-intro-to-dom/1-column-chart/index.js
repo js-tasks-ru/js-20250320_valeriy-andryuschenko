@@ -11,12 +11,12 @@ export default class ColumnChart {
     this.formatHeading = params.formatHeading || this.formatHeading;
     this.maxValue = Math.max(...this.charts);
     this.scale = 50 / this.maxValue;
-    this.createColumnChart();
+    this.element.innerHTML = this.createTemplate();
   }
 
   update(data) {
     this.data = data;
-    this.element.innerHTML = this.createTemplate()
+    this.element.innerHTML = this.createTemplate();
   }
 
   destroy() {
@@ -33,30 +33,29 @@ export default class ColumnChart {
 
   createTemplate() {
     return `
-      <div class="column-chart__title">
-        Total ${this.label}
-        ${this.createLinkTemlate()}
-      </div>
-      <div class="column-chart__container">
-        <div data-element="header" class="column-chart__header">
-            ${this.formatHeading(this.value)}
+      <div class="column-chart ${this.getDefaultLoading()}" style="--chart-height: ${this.chartHeight}">
+        <div class="column-chart__title">
+          Total ${this.label}
+          ${this.createLinkTemlate()}
         </div>
-        <div data-element="body" class="column-chart__chart">
-            ${this.createCharts()}
+        <div class="column-chart__container">
+          <div data-element="header" class="column-chart__header">
+              ${this.formatHeading(this.value)}
+          </div>
+          <div data-element="body" class="column-chart__chart">
+              ${this.createCharts()}
+          </div>
         </div>
       </div>
     `;
   }
 
-  createColumnChart() {
-    this.element.classList.add('column-chart');
-    this.element.style = `--chart-height: ${this.chartHeight}`;
-    this.element.innerHTML = this.createTemplate();
-
+  getDefaultLoading() {
     if (this.charts.length === 0) {
-      this.element.classList.add("column-chart_loading");
+      return 'column-chart_loading';
     }
 
+    return '';
   }
 
   createCharts() {
