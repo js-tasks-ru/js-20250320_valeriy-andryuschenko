@@ -12,6 +12,8 @@ export default class ColumnChart {
     this.maxValue = Math.max(...this.charts);
     this.scale = 50 / this.maxValue;
     this.element.innerHTML = this.createTemplate();
+    this.setLoadingDefault();
+    this.element.style = "--chart-height: ${this.chartHeight}";
   }
 
   update(data) {
@@ -33,29 +35,25 @@ export default class ColumnChart {
 
   createTemplate() {
     return `
-      <div class="column-chart ${this.getDefaultLoading()}" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">
-          Total ${this.label}
-          ${this.createLinkTemlate()}
+      <div class="column-chart__title">
+        Total ${this.label}
+        ${this.createLinkTemlate()}
+      </div>
+      <div class="column-chart__container">
+        <div data-element="header" class="column-chart__header">
+            ${this.formatHeading(this.value)}
         </div>
-        <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-              ${this.formatHeading(this.value)}
-          </div>
-          <div data-element="body" class="column-chart__chart">
-              ${this.createCharts()}
-          </div>
+        <div data-element="body" class="column-chart__chart">
+            ${this.createCharts()}
         </div>
       </div>
     `;
   }
 
-  getDefaultLoading() {
+  setLoadingDefault() {
     if (this.charts.length === 0) {
-      return 'column-chart_loading';
+      this.element.classList.add('column-chart_loading');
     }
-
-    return '';
   }
 
   createCharts() {
