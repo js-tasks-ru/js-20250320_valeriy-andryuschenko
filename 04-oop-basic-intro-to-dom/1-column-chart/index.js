@@ -36,6 +36,7 @@ export default class ColumnChart {
 
   createTemplate() {
     return `
+    <div class="column-chart">
       <div class="column-chart__title">
         Total ${this.label}
         ${this.createLinkTemlate()}
@@ -48,6 +49,7 @@ export default class ColumnChart {
             ${this.createCharts()}
         </div>
       </div>
+    </div>
     `;
   }
 
