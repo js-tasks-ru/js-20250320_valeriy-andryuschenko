@@ -22,7 +22,7 @@ export default class ColumnChart {
   }
 
   destroy() {
-    this.element = null;
+    this.remove();
   }
 
   remove() {

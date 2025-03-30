@@ -1,5 +1,6 @@
 export default class NotificationMessage {
   element = document.createElement("div");
+
   constructor(message = '', timer = {}) {
     this.duration = timer.duration || 2000;
     this.type = timer.type || 'error';
@@ -8,26 +9,21 @@ export default class NotificationMessage {
     this.element.classList.add(this.type);
   }
 
-  show(div = null) {
-    if(div) {
-      div.append(this.element);
-      document.body.append(div);
-    } else {
-      document.body.append(this.element);
-    }
+  show(container = document.body) {
+    container.append(this.element);
 
-    setTimeout(() => {
+    this.timerId = setTimeout(() => {
       this.remove();
     }, this.duration);
-
   }
 
   remove() {
-    this.element.remove();
+    clearTimeout(this.timerId);
+    this.remove();
   }
 
   destroy() {
-    this.element.remove();
+    this.remove();
   }
 
   createTemplate() {
