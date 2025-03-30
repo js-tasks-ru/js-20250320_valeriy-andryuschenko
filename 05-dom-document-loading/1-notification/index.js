@@ -18,11 +18,11 @@ export default class NotificationMessage {
   }
 
   remove() {
-    clearTimeout(this.timerId);
-    this.remove();
+    this.element.remove();
   }
 
   destroy() {
+    clearTimeout(this.timerId);
     this.remove();
   }
 
