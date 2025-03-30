@@ -1,16 +1,21 @@
 export default class NotificationMessage {
-  outerElement = document.createElement("div");
   element = document.createElement("div");
   constructor(message = '', timer = {}) {
     this.duration = timer.duration || 2000;
     this.type = timer.type || 'error';
     this.message = message;
+    this.element.innerHTML = this.createTemplate();
+    this.element.classList.add(this.type);
   }
 
-  show() {
-    this.element.innerHTML = this.createTemplate();
-    this.outerElement.append(this.element);
-    document.body.append(this.outerElement);
+  show(div = null) {
+    if(div) {
+      div.append(this.element);
+      document.body.append(div);
+    } else {
+      document.body.append(this.element);
+    }
+
     setTimeout(() => {
       this.remove();
     }, this.duration);
