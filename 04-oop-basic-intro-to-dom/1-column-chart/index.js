@@ -13,7 +13,6 @@ export default class ColumnChart {
     this.scale = 50 / this.maxValue;
     this.element.innerHTML = this.createTemplate();
     this.setLoadingDefault();
-    this.element.style = "--chart-height: ${this.chartHeight}";
   }
 
   update(data) {
@@ -36,7 +35,7 @@ export default class ColumnChart {
 
   createTemplate() {
     return `
-    <div class="column-chart">
+    <div class="column-chart" style="--chart-height: ${this.chartHeight}">
       <div class="column-chart__title">
         Total ${this.label}
         ${this.createLinkTemlate()}
