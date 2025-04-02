@@ -1,11 +1,68 @@
 export default class SortableTable {
   element = document.createElement('div');
-
+  subElements = document.createElement('div');
+  typesNumber = ['price', 'quantity', 'sales'];
   constructor(headerConfig = [], data = []) {
     this.config = headerConfig;
     this.data = data;
-    console.log(this.data);
+    this.subElements.classList.add('sortable-table__body');
+    this.subElements.dataset.element = 'body';
+    this.createTemplateProducts();
     this.element.innerHTML = this.createTamplate();
+  }
+
+  sort(field, sortType) {
+    const cellIndex = this.config.findIndex(obj => obj.id === field);
+    const sortable = this.config[cellIndex].sortable;
+
+    if (field === 'images' || !sortable) {
+      return;
+    }
+
+    if (field === 'title' && sortable) {
+      this.data.sort((a, b) => a[field].localeCompare(b[field], ['ru', 'en'], {caseFirst: "upper"}));
+    }
+
+    if (field === 'date' && sortable) {
+      this.data.sort((a, b) => new Date(a[field]) - new Date(b[field]));
+    }
+
+    if (this.typesNumber.includes(field)) {
+      this.data.sort((a, b) => Number(a[field]) - Number(b[field]));
+    }
+
+    if (sortType === 'desc') {
+      this.data.reverse();
+    }
+
+    this.createTemplateProducts();
+    this.element.innerHTML = this.createTamplate();
+  }
+
+
+  destroy() {
+    this.element.remove();
+  }
+
+  createTemplateProducts() {
+    this.subElements.innerHTML = `
+              ${this.data.map(product => {
+                return `
+                  <a href="/products/${product.id}" class="sortable-table__row">
+                    <div class="sortable-table__cell">
+                      ${product.hasOwnProperty('images') && product.images.length > 0 ?
+            `<img className="sortable-table-image" alt="Image" src="${product.images[0].url}">` : ''
+          }
+                  </div>
+                  <div class="sortable-table__cell">${product.title}</div>
+
+                <div class="sortable-table__cell">${product.quantity}</div>
+                <div class="sortable-table__cell">${product.price}</div>
+                <div class="sortable-table__cell">${product.sales}</div>
+                </a>
+                `;
+        })}
+    `;
   }
 
   createTamplate() {
@@ -20,34 +77,18 @@ export default class SortableTable {
               }
 
               return `
-                <div className="sortable-table__cell" data-id="${configTitle.id}" data-sortable="${configTitle.sortable}" data-order="asc">
-                   <span>${configTitle.title}</span>
-                </div>`;
-              }).join('')}
+                        <div className="sortable-table__cell" data-id="${configTitle.id}" data-sortable="${configTitle.sortable}" data-order="asc">
+                           <span>${configTitle.title}</span>
+                        </div>`;
+            }).join('')}
 
             <!-- header end -->
         </div>
+        <!--    products begin    -->
 
-        <div data-element="body" class="sortable-table__body">
+        ${this.subElements.outerHTML}
 
-          ${this.data.map(product => {
-            return `
-              <a href="/products/${product.id}" class="sortable-table__row">
-                <div class="sortable-table__cell">
-                  ${product.images.length > 0 ?
-                    `<img className="sortable-table-image" alt="Image" src="${product.images[0].url}">` : ''
-                  }
-              </div>
-              <div class="sortable-table__cell">${product.title}</div>
-
-            <div class="sortable-table__cell">${product.quantity}</div>
-            <div class="sortable-table__cell">${product.price}</div>
-            <div class="sortable-table__cell">${product.sales}</div>
-            </a>
-            `
-    })}
-
-        </div>
+        <!--    products end    -->
 
         <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
 
