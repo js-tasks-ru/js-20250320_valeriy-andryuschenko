@@ -1,10 +1,18 @@
 
 export default class SortableTable {
   typesNumber = ['price', 'quantity', 'sales'];
+  subElements = {}
   constructor(config = [], data = []) {
     this.config = config;
     this.data = data;
     this.element = this.createElement(this.template());
+    this.selectSubElements();
+  }
+
+  selectSubElements() {
+    this.element.querySelectorAll('[data-element]').forEach(element => {
+      this.subElements[element.dataset.element] = element;
+    });
   }
 
   createElement(template) {
@@ -90,8 +98,8 @@ export default class SortableTable {
       this.data.reverse();
     }
 
-    this.subElements = this.element.querySelector('.sortable-table__body');
-    this.subElements.innerHTML = this.createTableBodyTemplate();
+    this.element.querySelector('.sortable-table__body').innerHTML = this.createTableBodyTemplate();
+    this.selectSubElements();
   }
 
   remove() {
