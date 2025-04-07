@@ -1,14 +1,87 @@
+
 export default class SortableTable {
-  element = document.createElement('div');
-  subElements = document.createElement('div');
   typesNumber = ['price', 'quantity', 'sales'];
-  constructor(headerConfig = [], data = []) {
-    this.config = headerConfig;
+  constructor(config = [], data = []) {
+    this.config = config;
     this.data = data;
-    this.subElements.classList.add('sortable-table__body');
-    this.subElements.dataset.element = 'body';
-    this.createTemplateProducts();
-    this.element.innerHTML = this.createTamplate();
+    this.element = this.createElement(this.template());
+    const columns = this.element.querySelectorAll('.sortable-table__cell[data-id]');
+
+    [...columns].forEach(column => {
+      console.log(`${column.dataset.id}=`, column.dataset.order);
+    });
+
+    const isSortingExists = [...columns].some(column => column.dataset.order);
+
+    console.log('isSortingExists=', isSortingExists);
+    console.log(columns);
+  }
+
+  createElement(template) {
+    const element = document.createElement('div');
+    element.innerHTML = template;
+
+    return element.firstElementChild;
+  }
+
+  createTableHeaderTemplate() {
+    return this.config.map(columnConfig => (
+      `<div class="sortable-table__cell" data-id="${columnConfig['id']}" data-sortable="${columnConfig['sortable']}" ${this.getDataOrder(columnConfig['id'])}>
+                <span>${columnConfig['title']}</span>
+            </div>`
+    )).join('');
+  }
+
+  getDataOrder(id) {
+    if (id !== 'images') {
+      return 'data-order="desc"';
+    }
+
+    return '';
+  }
+
+  createTableBodyCellTemplate(product, columnConfig) {
+    if (columnConfig.template) {
+      return columnConfig.template(product);
+    }
+    const fieldId = columnConfig['id'];
+    return `<div class="sortable-table__cell">${product[fieldId]}</div>`;
+  }
+
+  createTableBodyRowTemplate(product) {
+    return `
+            <a href="/products/3d-ochki-optoma-zf2300" class="sortable-table__row">
+                ${this.config.map(columnConfig =>
+      this.createTableBodyCellTemplate(product, columnConfig)
+    ).join('')}
+            </a>
+        `
+  }
+
+  createTableBodyTemplate() {
+    return this.data.map(product => (
+      this.createTableBodyRowTemplate(product)
+    )).join('')
+  }
+
+  template() {
+    return `
+            <div class="sortable-table">
+                <div data-element="header" class="sortable-table__header sortable-table__row">
+                    ${this.createTableHeaderTemplate()}
+                </div>
+                <div data-element="body" class="sortable-table__body">
+                    ${this.createTableBodyTemplate()}
+                </div>
+                <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
+                <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
+                    <div>
+                        <p>No products satisfies your filter criteria</p>
+                        <button type="button" class="button-primary-outline">Reset all filters</button>
+                    </div>
+                </div>
+            </div>
+        `;
   }
 
   sort(field, sortType) {
@@ -35,72 +108,18 @@ export default class SortableTable {
       this.data.reverse();
     }
 
-    this.createTemplateProducts();
-    this.element.innerHTML = this.createTamplate();
+    this.subElements = document.createElement('div');
+    this.subElements.innerHTML = this.createTableBodyTemplate();
+    const table = this.element.querySelector('.sortable-table__body');
+    table.innerHTML = this.subElements.innerHTML;
   }
 
-
-  destroy() {
+  remove() {
     this.element.remove();
   }
 
-  createTemplateProducts() {
-    this.subElements.innerHTML = `
-              ${this.data.map(product => {
-                return `
-                  <a href="/products/${product.id}" class="sortable-table__row">
-                    <div class="sortable-table__cell">
-                      ${product.hasOwnProperty('images') && product.images.length > 0 ?
-            `<img className="sortable-table-image" alt="Image" src="${product.images[0].url}">` : ''
-          }
-                  </div>
-                  <div class="sortable-table__cell">${product.title}</div>
-
-                <div class="sortable-table__cell">${product.quantity}</div>
-                <div class="sortable-table__cell">${product.price}</div>
-                <div class="sortable-table__cell">${product.sales}</div>
-                </a>
-                `;
-        })}
-    `;
-  }
-
-  createTamplate() {
-    return `
-      <div class="sortable-table">
-
-        <div data-element="header" class="sortable-table__header sortable-table__row">
-        <!-- header start -->
-           ${this.config.map(configTitle => {
-              if (configTitle.template) {
-                return configTitle.template();
-              }
-
-              return `
-                        <div className="sortable-table__cell" data-id="${configTitle.id}" data-sortable="${configTitle.sortable}" data-order="asc">
-                           <span>${configTitle.title}</span>
-                        </div>`;
-            }).join('')}
-
-            <!-- header end -->
-        </div>
-        <!--    products begin    -->
-
-        ${this.subElements.outerHTML}
-
-        <!--    products end    -->
-
-        <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-
-        <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          <div>
-            <p>No products satisfies your filter criteria</p>
-            <button type="button" class="button-primary-outline">Reset all filters</button>
-          </div>
-        </div>
-  </div>
-    `;
+  destroy() {
+    this.remove();
   }
 
 }
-
