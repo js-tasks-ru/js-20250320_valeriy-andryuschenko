@@ -5,16 +5,6 @@ export default class SortableTable {
     this.config = config;
     this.data = data;
     this.element = this.createElement(this.template());
-    const columns = this.element.querySelectorAll('.sortable-table__cell[data-id]');
-
-    [...columns].forEach(column => {
-      console.log(`${column.dataset.id}=`, column.dataset.order);
-    });
-
-    const isSortingExists = [...columns].some(column => column.dataset.order);
-
-    console.log('isSortingExists=', isSortingExists);
-    console.log(columns);
   }
 
   createElement(template) {
@@ -26,18 +16,10 @@ export default class SortableTable {
 
   createTableHeaderTemplate() {
     return this.config.map(columnConfig => (
-      `<div class="sortable-table__cell" data-id="${columnConfig['id']}" data-sortable="${columnConfig['sortable']}" ${this.getDataOrder(columnConfig['id'])}>
+      `<div class="sortable-table__cell" data-id="${columnConfig['id']}" data-sortable="${columnConfig['sortable']}" data-order="">
                 <span>${columnConfig['title']}</span>
             </div>`
     )).join('');
-  }
-
-  getDataOrder(id) {
-    if (id !== 'images') {
-      return 'data-order="desc"';
-    }
-
-    return '';
   }
 
   createTableBodyCellTemplate(product, columnConfig) {
@@ -108,10 +90,8 @@ export default class SortableTable {
       this.data.reverse();
     }
 
-    this.subElements = document.createElement('div');
+    this.subElements = this.element.querySelector('.sortable-table__body');
     this.subElements.innerHTML = this.createTableBodyTemplate();
-    const table = this.element.querySelector('.sortable-table__body');
-    table.innerHTML = this.subElements.innerHTML;
   }
 
   remove() {
