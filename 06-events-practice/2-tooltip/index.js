@@ -33,7 +33,7 @@ class Tooltip {
     this.element.remove();
   }
 
-  render(container = null) {
+  render(container = '') {
     if (!container) {
       const imgDefault = document.createElement("img");
       imgDefault.setAttribute("src", "public/tooltip.gif");
