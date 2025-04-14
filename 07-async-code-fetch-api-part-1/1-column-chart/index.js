@@ -3,11 +3,13 @@ import fetchJson from './utils/fetch-json.js';
 
 export default class ColumnChart {
   static BACKEND_URL = 'https://course-js.javascript.ru';
+  subElements = {};
   element = document.createElement("div");
   chartHeight = 50;
   formatHeading = (value) => value;
 
   constructor(params = {}) {
+    this.value = params.value || '';
     this.url = params.url || '';
     this.label = params.label || '';
     this.link = params.link || '';
@@ -21,19 +23,28 @@ export default class ColumnChart {
         this.maxValue = Math.max(...this.charts);
         this.scale = 50 / this.maxValue;
         return data;
-      }).then((data) => {
+      }).then(() => {
         this.element.innerHTML = this.createTemplate();
-        this.setLoadingDefault();
-      })
+    }).then(() => {
+      this.setLoadingDefault();
+    })
       .catch((err) => {
         console.error(err);
       });
   }
 
+  selectSubElements() {
+    this.element.querySelectorAll('[data-element]').forEach(element => {
+      this.subElements[element.dataset.element] = element;
+    });
+  }
+
   async update(startDate, endDate) {
     const url = `${ColumnChart.BACKEND_URL}/${this.url}?from=${startDate.toISOString()}&to=${endDate.toISOString()}`;
     const response = await fetch(url, {});
-    return await response.json();
+    this.charts = await response.json();
+
+
   }
 
   destroy() {
