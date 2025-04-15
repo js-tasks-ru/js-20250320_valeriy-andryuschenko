@@ -1,12 +1,34 @@
-
 export default class SortableTable {
   typesNumber = ['price', 'quantity', 'sales'];
-  subElements = {}
-  constructor(config = [], data = []) {
-    this.config = config;
+  subElements = {};
+
+  constructor(headersConfig, {
+    data = [], sorted = {}
+  } = {}) {
+    this.config = headersConfig;
     this.data = data;
+    this.sorted = sorted;
     this.element = this.createElement(this.template());
+    this.sort(this.sorted.id, this.sorted.order);
     this.selectSubElements();
+    this.eventHandler();
+  }
+
+  eventHandler() {
+    const header = this.element.querySelector('[data-element="header"]');
+    if (header) {
+      header.addEventListener('pointerdown', this.handlerClick.bind(this),
+        {bubbles: true}
+      );
+    }
+  }
+
+  handlerClick(event) {
+    const parent = event.target.closest('.sortable-table__cell');
+    const arrow = parent.querySelector('.sortable-table__sort-arrow');
+
+    parent.dataset.order = parent.dataset.order === 'asc' ? 'desc' : 'asc';
+    this.sort(parent.dataset.id, parent.dataset.order);
   }
 
   selectSubElements() {
@@ -23,11 +45,27 @@ export default class SortableTable {
   }
 
   createTableHeaderTemplate() {
-    return this.config.map(columnConfig => (
-      `<div class="sortable-table__cell" data-id="${columnConfig['id']}" data-sortable="${columnConfig['sortable']}" data-order="">
+    return this.config.map(columnConfig => (`<div class="sortable-table__cell" data-id="${columnConfig['id']}"
+            data-sortable="${columnConfig['sortable']}"
+            data-order=${this.getOrderType(columnConfig['id'])}>
                 <span>${columnConfig['title']}</span>
-            </div>`
-    )).join('');
+                ${this.createArrowSort(columnConfig['id'])}
+            </div>`)).join('');
+  }
+
+  getOrderType(id) {
+    if (id === this.sorted.id) {
+      return this.sorted.order;
+    }
+
+    return '';
+  }
+
+  createArrowSort() {
+    return `
+        <span data-element="arrow" class="sortable-table__sort-arrow">
+          <span class="sort-arrow"></span>
+        </span>`;
   }
 
   createTableBodyCellTemplate(product, columnConfig) {
@@ -35,23 +73,23 @@ export default class SortableTable {
       return columnConfig.template(product);
     }
     const fieldId = columnConfig['id'];
+
+    if (fieldId === 'title') {
+      return `<div class="sortable-table__cell">${product[fieldId].replace(/\r?\n|\r/g, '')}</div>`;
+    }
     return `<div class="sortable-table__cell">${product[fieldId]}</div>`;
   }
 
   createTableBodyRowTemplate(product) {
     return `
             <a href="/products/3d-ochki-optoma-zf2300" class="sortable-table__row">
-                ${this.config.map(columnConfig =>
-      this.createTableBodyCellTemplate(product, columnConfig)
-    ).join('')}
+                ${this.config.map(columnConfig => this.createTableBodyCellTemplate(product, columnConfig)).join('')}
             </a>
-        `
+        `;
   }
 
   createTableBodyTemplate() {
-    return this.data.map(product => (
-      this.createTableBodyRowTemplate(product)
-    )).join('')
+    return this.data.map(product => (this.createTableBodyRowTemplate(product))).join('');
   }
 
   template() {
