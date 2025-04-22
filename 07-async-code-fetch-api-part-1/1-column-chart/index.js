@@ -1,36 +1,32 @@
-import fetchJson from './utils/fetch-json.js';
-
-
 export default class ColumnChart {
   static BACKEND_URL = 'https://course-js.javascript.ru';
   subElements = {};
-  element = document.createElement("div");
+  element;
   chartHeight = 50;
   formatHeading = (value) => value;
 
   constructor(params = {}) {
     this.value = params.value || '';
-    this.url = params.url || '';
+    this.url = params.url || 'api/dashboard/orders';
     this.label = params.label || '';
     this.link = params.link || '';
     this.range = params.range || {};
     this.formatHeading = params.formatHeading || this.formatHeading;
+    this.element = this.createElement(this.template());
+    this.setLoadingDefault();
+    this.selectSubElements();
 
-    this.response = this.update(this.range.from, this.range.to);
+    this.response = this.update(this.range?.from, this.range?.to);
     this.response
       .then((data) => {
-        this.charts = Object.values(data);
-        this.maxValue = Math.max(...this.charts);
-        this.scale = 50 / this.maxValue;
-        return data;
+        this.subElements.body.innerHTML = this.createCharts(data);
       }).then(() => {
-        this.element.innerHTML = this.createTemplate();
-    }).then(() => {
-      this.setLoadingDefault();
-    })
+        this.setLoadingDefault(false);
+      })
       .catch((err) => {
         console.error(err);
       });
+
   }
 
   selectSubElements() {
@@ -39,12 +35,15 @@ export default class ColumnChart {
     });
   }
 
-  async update(startDate, endDate) {
-    const url = `${ColumnChart.BACKEND_URL}/${this.url}?from=${startDate.toISOString()}&to=${endDate.toISOString()}`;
+  async update(startDate = new Date(), endDate = new Date()) {
+    const url = `${ColumnChart.BACKEND_URL}/${this.url}?from=${startDate?.toISOString()}&to=${endDate?.toISOString()}`;
     const response = await fetch(url, {});
-    this.charts = await response.json();
+    const data = await response.json();
+    this.maxValue = Math.max(...Object.values(data));
+    this.scale = 50 / this.maxValue;
+    this.subElements.body.innerHTML = this.createCharts(data);
 
-
+    return data;
   }
 
   destroy() {
@@ -59,7 +58,14 @@ export default class ColumnChart {
     return this.link ? `<a href="${this.link}" class="column-chart__link">View all</a>` : '';
   }
 
-  createTemplate() {
+  createElement(template) {
+    const element = document.createElement('div');
+    element.innerHTML = template;
+
+    return element.firstElementChild;
+  }
+
+  template() {
     return `
     <div class="column-chart" style="--chart-height: ${this.chartHeight}">
       <div class="column-chart__title">
@@ -71,28 +77,28 @@ export default class ColumnChart {
             ${this.formatHeading(this.value)}
         </div>
         <div data-element="body" class="column-chart__chart">
-            ${this.createCharts()}
+
         </div>
       </div>
     </div>
     `;
   }
 
-  setLoadingDefault() {
-    if (this.charts.length === 0) {
+  setLoadingDefault(show = true) {
+    if (show) {
       this.element.classList.add('column-chart_loading');
     } else {
       this.element.classList.remove('column-chart_loading');
     }
   }
 
-  createCharts() {
-    if (this.charts.length === 0) {
-      return;
+  createCharts(charts) {
+    if (Object.keys(charts).length === 0) {
+      return '';
     }
 
-    return this.charts.map(chart => {
-      const percent = (chart / this.maxValue * 100).toFixed(0) + '%';
+    return Object.values(charts).map(chart => {
+      const percent = ((chart / this.maxValue * 100).toFixed(0)) + '%';
       const value = String(Math.floor(chart * this.scale));
       return `<div style="--value: ${value}" data-tooltip="${percent}"></div>`;
     }).join('');
