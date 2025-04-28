@@ -18,7 +18,7 @@ describe('events-practice/double-slider', () => {
     doubleSlider = new DoubleSlider({
       min: 100,
       max: 200,
-      formatValue: value => '$' + value,
+      formatValue: value => value,
       selected: {
         from: 120,
         to: 150

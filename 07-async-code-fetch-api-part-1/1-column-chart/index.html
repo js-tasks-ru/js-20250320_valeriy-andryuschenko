@@ -16,6 +16,7 @@
       </div>
       <div id="sales" class="dashboard__chart_sales"></div>
       <div id="customers" class="dashboard__chart_customers"></div>
+      <div id="test" class="dashboard__chart_customers"></div>
     </div>
 
     <script type="module">
@@ -70,6 +71,11 @@
         label: 'customers',
       });
 
+      const label = 'New label';
+
+      let columnChart = new ColumnChart({ label });
+
+      test.append(columnChart.element);
       orders.append(ordersChart.element);
       sales.append(salesChart.element);
       customers.append(customersChart.element);
