@@ -18,6 +18,11 @@ export default class DoubleSlider {
     this.createEventListeners();
   }
 
+  createEventListeners() {
+    this.subElements.thumbRight.addEventListener('pointerdown', this.handleThumbPointerDown);
+    this.subElements.thumbLeft.addEventListener('pointerdown', this.handleThumbPointerDown);
+  }
+
   selectedSubElements() {
     this.element.querySelectorAll('[data-element]').forEach((element) => {
       this.subElements[element.dataset.element] = element;
@@ -44,11 +49,6 @@ export default class DoubleSlider {
         <span data-element="to">${this.formatValue(this.to)}</span>
       </div>
     `;
-  }
-
-  createEventListeners() {
-    this.subElements.thumbRight.addEventListener('poinderdown', this.handleThumbPointerDown);
-    this.subElements.thumbLeft.addEventListener('poinderdown', this.handleThumbPointerDown);
   }
 
   handleThumbPointerDown(e) {
